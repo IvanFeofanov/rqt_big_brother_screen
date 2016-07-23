@@ -1,0 +1,17 @@
+<library path="lib/librqt_big_brother_screen">
+  <class name="rqt_big_brother_screen/BigBrotherScreen" type="rqt_big_brother_screen::BigBrotherScreen" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      A GUI plugin to watching and control for robot mower
+    </description>
+
+    <qtgui>
+      <!-- <group> -->
+        <!-- <label>Visualization</label> -->
+      <!-- </group> -->
+
+      <label>Big brother screen</label>
+      <icon type="theme">image-x-generic</icon>
+      <statustip> A GUI plugin to watching and control for robot mower </statustip>
+    </qtgui>
+  </class>
+</library>
