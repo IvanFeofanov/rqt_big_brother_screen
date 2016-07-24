@@ -122,7 +122,8 @@ set(rqt_big_brother_screen_SRCS
     src/rqt_big_brother_screen/editable_polygon_graphics_item.cpp
     src/rqt_big_brother_screen/mid_node_polygon_graphics_item.cpp
     src/rqt_big_brother_screen/node_polygon_graphics_item.cpp
-    src/rqt_big_brother_screen/polygon_graphics_item.cpp)
+    src/rqt_big_brother_screen/polygon_graphics_item.cpp
+    src/rqt_big_brother_screen/trajectory_graphics_item.cpp)
 
 set(rqt_big_brother_screen_HDRS
     include/rqt_big_brother_screen/big_brother_screen.h
@@ -131,7 +132,8 @@ set(rqt_big_brother_screen_HDRS
     include/rqt_big_brother_screen/editable_polygon_graphics_item.h
     include/rqt_big_brother_screen/mid_node_polygon_graphics_item.h
     include/rqt_big_brother_screen/node_polygon_graphics_item.h
-    include/rqt_big_brother_screen/polygon_graphics_item.h)
+    include/rqt_big_brother_screen/polygon_graphics_item.h
+    include/rqt_big_brother_screen/trajectory_graphics_item.h)
 
 
 set(rqt_big_brother_screen_UIS

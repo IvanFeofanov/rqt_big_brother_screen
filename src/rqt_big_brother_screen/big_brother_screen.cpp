@@ -33,6 +33,7 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     createScene();
     createImageItem();
     createAreaItem();
+    createTraversedPathItem();
 
     //edit settings
     connect(ui_.pushButtonSettings, SIGNAL(pressed()),
@@ -43,6 +44,9 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     //edit area
     connect(ui_.pushButtonArea, SIGNAL(toggled(bool)),
             this, SLOT(editArea(bool)));
+    //clear traversed path
+    connect(ui_.pushButtonClearPath, SIGNAL(pressed()),
+            this, SLOT(clearTraversedPath()));
 
     //image transport subscriber
     setTopicImage("");
@@ -51,6 +55,10 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
 void BigBrotherScreen::shutdownPlugin()
 {
     image_subscriber_.shutdown();
+
+    delete image_item_;
+    delete area_item_;
+    delete traversed_path_item_;
 }
 
 void BigBrotherScreen::saveSettings(qt_gui_cpp::Settings& plugin_settings,
@@ -136,6 +144,16 @@ void BigBrotherScreen::createAreaItem()
     ui_.graphicsView->scene()->addItem(area_item_);
 }
 
+void BigBrotherScreen::createTraversedPathItem()
+{
+    QList<QPointF> points;
+    points  << QPointF(0, 0)
+            << QPointF(50, 50)
+            << QPointF(50, 100);
+    traversed_path_item_ = new TrajectoryGraphicsItem(points);
+    ui_.graphicsView->scene()->addItem(traversed_path_item_);
+}
+
 void BigBrotherScreen::editSettings()
 {
     SettingsDialog* sd = new SettingsDialog();
@@ -163,7 +181,13 @@ void BigBrotherScreen::editArea(bool is_editable)
     area_item_->setEditable(is_editable);
 
     // if(!is_editable)
-        //TODO send current area
+        // TODO send current area
+}
+
+void BigBrotherScreen::clearTraversedPath()
+{
+    traversed_path_item_->clear();
+    //TODO
 }
 
 }//namespace

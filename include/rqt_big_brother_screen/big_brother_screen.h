@@ -2,9 +2,10 @@
 #define RQT_BIG_BROTHER_SCREEN_H
 
 #include <rqt_big_brother_screen/ui_big_brother_screen.h>
-#include <rqt_big_brother_screen/image_graphics_item.h>
 
+#include <rqt_big_brother_screen/image_graphics_item.h>
 #include <rqt_big_brother_screen/editable_polygon_graphics_item.h>
+#include <rqt_big_brother_screen/trajectory_graphics_item.h>
 
 #include <rqt_gui_cpp/plugin.h>
 #include <image_transport/image_transport.h>
@@ -29,16 +30,20 @@ public:
             const qt_gui_cpp::Settings& instance_settings);
 private:
     void callbackImage(const sensor_msgs::ImageConstPtr &msg);
+    // void callbackRobotPos(
+
     void setTopicImage(const QString &topic);
-    
+
     void createScene();
     void createImageItem();
     void createAreaItem();
+    void createTraversedPathItem();
 
 private slots:
     void editSettings();
     void setZoomOne();
     void editArea(bool is_editable);
+    void clearTraversedPath();
 
 private:
     Ui::Window ui_;
@@ -48,6 +53,8 @@ private:
 
     ImageGraphicsItem* image_item_;
     EditablePolygonGraphicsItem* area_item_;
+    TrajectoryGraphicsItem* traversed_path_item_;
+
 };
 
 }
