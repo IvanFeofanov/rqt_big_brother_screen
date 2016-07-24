@@ -4,6 +4,8 @@
 #include <rqt_big_brother_screen/ui_big_brother_screen.h>
 #include <rqt_big_brother_screen/image_graphics_item.h>
 
+#include <rqt_big_brother_screen/editable_polygon_graphics_item.h>
+
 #include <rqt_gui_cpp/plugin.h>
 #include <image_transport/image_transport.h>
 
@@ -26,13 +28,17 @@ public:
     virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
             const qt_gui_cpp::Settings& instance_settings);
 private:
-    void setTopicImage(const QString &topic);
     void callbackImage(const sensor_msgs::ImageConstPtr &msg);
+    void setTopicImage(const QString &topic);
+    
+    void createScene();
+    void createImageItem();
+    void createAreaItem();
 
 private slots:
     void editSettings();
     void setZoomOne();
-    void setArea();
+    void editArea(bool is_editable);
 
 private:
     Ui::Window ui_;
@@ -41,6 +47,7 @@ private:
     image_transport::Subscriber image_subscriber_;
 
     ImageGraphicsItem* image_item_;
+    EditablePolygonGraphicsItem* area_item_;
 };
 
 }

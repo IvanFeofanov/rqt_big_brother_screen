@@ -9,6 +9,8 @@
 #include <QImage>
 #include <QPixmap>
 #include <QGraphicsScene>
+#include <QPolygonF>
+
 #include <iostream>
 namespace rqt_big_brother_screen
 {
@@ -28,17 +30,19 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     context.addWidget(widget_);
 
     //graphics view
-    QGraphicsScene* scene = new QGraphicsScene(this);
-    image_item_ =  new ImageGraphicsItem(QImage());
-    scene->addItem(image_item_);
-    ui_.graphicsView->setScene(scene);
-    ui_.graphicsView->setRenderHint(QPainter::Antialiasing);
+    createScene();
+    createImageItem();
+    createAreaItem();
 
     //edit settings
     connect(ui_.pushButtonSettings, SIGNAL(pressed()),
             this, SLOT(editSettings()));
+    //set zoom
     connect(ui_.pushButtonZoomOne, SIGNAL(pressed()),
             this, SLOT(setZoomOne()));
+    //edit area
+    connect(ui_.pushButtonArea, SIGNAL(toggled(bool)),
+            this, SLOT(editArea(bool)));
 
     //image transport subscriber
     setTopicImage("");
@@ -100,6 +104,38 @@ void BigBrotherScreen::setTopicImage(const QString &topic)
     }
 }
 
+void BigBrotherScreen::createScene()
+{
+    QRect default_scene_size(0, 0, 640, 480);
+    QGraphicsScene* scene = new QGraphicsScene(default_scene_size, this);
+    ui_.graphicsView->setScene(scene);
+    ui_.graphicsView->setRenderHint(QPainter::Antialiasing);
+}
+
+void BigBrotherScreen::createImageItem()
+{
+    image_item_ =  new ImageGraphicsItem(QImage());
+    ui_.graphicsView->scene()->addItem(image_item_);
+}
+
+void BigBrotherScreen::createAreaItem()
+{
+    QPolygonF polygon;
+    QRectF scene_rect = ui_.graphicsView->scene()->sceneRect();
+    QPointF center_point(scene_rect.width() / 2, scene_rect.height() / 2);
+    polygon << QPointF( center_point.x() - scene_rect.width() / 4,
+                        center_point.y() - scene_rect.height() / 4)
+            << QPointF( center_point.x() + scene_rect.width() / 4,
+                        center_point.y() - scene_rect.height() / 4)
+            << QPointF( center_point.x() + scene_rect.width() / 4,
+                        center_point.y() + scene_rect.height() / 4)
+            << QPointF( center_point.x() - scene_rect.width() / 4,
+                        center_point.y() + scene_rect.height() / 4);
+
+    area_item_ = new EditablePolygonGraphicsItem(polygon);
+    ui_.graphicsView->scene()->addItem(area_item_);
+}
+
 void BigBrotherScreen::editSettings()
 {
     SettingsDialog* sd = new SettingsDialog();
@@ -122,9 +158,12 @@ void BigBrotherScreen::setZoomOne()
     ui_.graphicsView->fitInView(image_item_, Qt::KeepAspectRatio);
 }
 
-void BigBrotherScreen::setArea()
+void BigBrotherScreen::editArea(bool is_editable)
 {
+    area_item_->setEditable(is_editable);
 
+    // if(!is_editable)
+        //TODO send current area
 }
 
 }//namespace
