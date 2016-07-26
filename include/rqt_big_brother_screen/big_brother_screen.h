@@ -7,6 +7,9 @@
 #include <rqt_big_brother_screen/editable_polygon_graphics_item.h>
 #include <rqt_big_brother_screen/trajectory_graphics_item.h>
 
+#include <rqt_big_brother_screen/edit_mode.h>
+#include <rqt_big_brother_screen/area_edit_mode.h>
+
 #include <rqt_gui_cpp/plugin.h>
 #include <image_transport/image_transport.h>
 
@@ -30,24 +33,46 @@ public:
             const qt_gui_cpp::Settings& instance_settings);
 private:
     void callbackImage(const sensor_msgs::ImageConstPtr &msg);
-    // void callbackRobotPos(
+    // void callbackRobotPos();
 
-    void setTopicImage(const QString &topic);
+    void setTopicImage(const QString &topic); //set topic name
 
     void createScene();
+    void createActions();
+    void createButtons();
+    void createContextMenu();
     void createImageItem();
     void createAreaItem();
     void createTraversedPathItem();
 
+    bool isEditView();
+
 private slots:
+    void setEditView(bool is_edit_view = false);
+    void saveEdit();
+    void cancelEdit();
+
     void editSettings();
     void setZoomOne();
-    void editArea(bool is_editable);
+    void editArea();
     void clearTraversedPath();
 
 private:
     Ui::Window ui_;
     QWidget* widget_;
+
+    EditMode* edit_mode_;
+
+    QAction* action_set_zoom1_;
+    QAction* action_edit_settings_;
+    QAction* action_edit_area_;
+    QAction* action_add_barrier_;
+    QAction* action_edit_barriers_;
+    QAction* action_remove_barriers_;
+    QAction* action_show_path_;
+    QAction* action_show_trajectory_;
+    QAction* action_clear_path_;
+    QAction* action_select_robot_;
 
     image_transport::Subscriber image_subscriber_;
 

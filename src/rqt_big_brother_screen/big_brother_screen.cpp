@@ -1,5 +1,7 @@
 #include <rqt_big_brother_screen/big_brother_screen.h>
+
 #include <rqt_big_brother_screen/settings_dialog.h>
+#include <rqt_big_brother_screen/graphics_scene_with_menu.h>
 
 #include <pluginlib/class_list_macros.h>
 #include <sensor_msgs/image_encodings.h>
@@ -8,10 +10,14 @@
 
 #include <QImage>
 #include <QPixmap>
-#include <QGraphicsScene>
 #include <QPolygonF>
 
+#include <QMenu>
+#include <QGraphicsScene>
+#include <QAction>
+
 #include <iostream>
+
 namespace rqt_big_brother_screen
 {
 
@@ -29,23 +35,40 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     ui_.setupUi(widget_);
     context.addWidget(widget_);
 
+    edit_mode_ = 0;
+
     //graphics view
     createScene();
+    createActions();
+    createButtons();
+    createContextMenu();
     createImageItem();
     createAreaItem();
     createTraversedPathItem();
 
-    //edit settings
-    connect(ui_.pushButtonSettings, SIGNAL(pressed()),
-            this, SLOT(editSettings()));
-    //set zoom
-    connect(ui_.pushButtonZoomOne, SIGNAL(pressed()),
+    setEditView(false);
+
+    //set zoom one
+    connect(action_set_zoom1_, SIGNAL(triggered()),
             this, SLOT(setZoomOne()));
+    //save edit
+    connect(ui_.pushButtonSaveEdit, SIGNAL(pressed()),
+            this, SLOT(saveEdit()));
+    connect(ui_.pushButtonSaveEdit, SIGNAL(pressed()),
+            this, SLOT(setEditView()));
+    //cancel edit
+    connect(ui_.pushButtonCancelEdit, SIGNAL(pressed()),
+            this, SLOT(cancelEdit()));
+    connect(ui_.pushButtonCancelEdit, SIGNAL(pressed()),
+            this, SLOT(setEditView()));
+    //edit settings
+    connect(action_edit_settings_, SIGNAL(triggered()),
+            this, SLOT(editSettings()));
     //edit area
-    connect(ui_.pushButtonArea, SIGNAL(toggled(bool)),
-            this, SLOT(editArea(bool)));
-    //clear traversed path
-    connect(ui_.pushButtonClearPath, SIGNAL(pressed()),
+    connect(action_edit_area_, SIGNAL(triggered()),
+            this, SLOT(editArea()));
+    //clear path
+    connect(action_clear_path_, SIGNAL(triggered()),
             this, SLOT(clearTraversedPath()));
 
     //image transport subscriber
@@ -115,9 +138,65 @@ void BigBrotherScreen::setTopicImage(const QString &topic)
 void BigBrotherScreen::createScene()
 {
     QRect default_scene_size(0, 0, 640, 480);
-    QGraphicsScene* scene = new QGraphicsScene(default_scene_size, this);
+    GraphicsSceneWithMenu* scene =
+        new GraphicsSceneWithMenu(default_scene_size, this);
     ui_.graphicsView->setScene(scene);
     ui_.graphicsView->setRenderHint(QPainter::Antialiasing);
+}
+
+void BigBrotherScreen::createActions()
+{
+    action_set_zoom1_ = new QAction("Zoom 1", this);
+    action_edit_settings_ = new QAction("Edit Settings...", this);
+
+    action_edit_area_ = new QAction("Edit Area", this);
+
+    action_add_barrier_ = new QAction("Add Barrier", this);
+    action_edit_barriers_ = new QAction("Edit Barriers", this);
+    action_remove_barriers_ = new QAction("Remove Barriers", this);
+
+    action_show_path_ = new QAction("Show Path", this);
+    action_show_path_->setCheckable(true);
+    action_show_trajectory_ = new QAction("Show Trajectory", this);
+    action_show_trajectory_->setCheckable(true);
+    action_clear_path_ = new QAction("Clear Path", this);
+
+    action_select_robot_ = new QAction("Select The Robot", this);
+}
+
+void BigBrotherScreen::createButtons()
+{
+    //zoom 1 button
+    ui_.toolButtonZoomOne->setDefaultAction(action_set_zoom1_);
+    ui_.toolButtonZoomOne->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+}
+
+void BigBrotherScreen::createContextMenu()
+{
+    GraphicsSceneWithMenu* scene =
+        (GraphicsSceneWithMenu*)ui_.graphicsView->scene();
+
+    QMenu* menu = new QMenu("file", ui_.graphicsView);
+    menu->addAction(action_edit_settings_);
+
+    menu->addSeparator();
+
+    menu->addAction(action_edit_area_);
+
+    menu->addSeparator();
+
+    menu->addAction(action_add_barrier_);
+    menu->addAction(action_edit_barriers_);
+    menu->addAction(action_remove_barriers_);
+
+    menu->addSeparator();
+
+    menu->addAction(action_show_path_);
+    menu->addAction(action_show_trajectory_);
+    menu->addAction(action_clear_path_);
+    menu->addAction(action_select_robot_);
+
+    scene->setMenu(menu);
 }
 
 void BigBrotherScreen::createImageItem()
@@ -146,12 +225,41 @@ void BigBrotherScreen::createAreaItem()
 
 void BigBrotherScreen::createTraversedPathItem()
 {
-    QList<QPointF> points;
-    points  << QPointF(0, 0)
-            << QPointF(50, 50)
-            << QPointF(50, 100);
-    traversed_path_item_ = new TrajectoryGraphicsItem(points);
-    ui_.graphicsView->scene()->addItem(traversed_path_item_);
+    traversed_path_item_ = new TrajectoryGraphicsItem();
+}
+
+bool BigBrotherScreen::isEditView()
+{
+    return ui_.pushButtonSaveEdit->isVisible();
+}
+
+void BigBrotherScreen::setEditView(bool is_edit_view)
+{
+    if(is_edit_view){
+        ui_.pushButtonSaveEdit->show();
+        ui_.pushButtonCancelEdit->show();
+    }else{
+        ui_.pushButtonSaveEdit->hide();
+        ui_.pushButtonCancelEdit->hide();
+    }
+}
+
+void BigBrotherScreen::saveEdit()
+{
+    if(edit_mode_ != 0)
+        edit_mode_->save();
+
+    delete edit_mode_; //edit end
+    edit_mode_ = 0;
+}
+
+void BigBrotherScreen::cancelEdit()
+{
+    if(edit_mode_ != 0)
+        edit_mode_->cancel();
+
+    delete edit_mode_; //edit end
+    edit_mode_ = 0;
 }
 
 void BigBrotherScreen::editSettings()
@@ -176,12 +284,11 @@ void BigBrotherScreen::setZoomOne()
     ui_.graphicsView->fitInView(image_item_, Qt::KeepAspectRatio);
 }
 
-void BigBrotherScreen::editArea(bool is_editable)
+void BigBrotherScreen::editArea()
 {
-    area_item_->setEditable(is_editable);
-
-    // if(!is_editable)
-        // TODO send current area
+    delete edit_mode_;
+    edit_mode_ = new AreaEditMode(area_item_, this);
+    setEditView(true);
 }
 
 void BigBrotherScreen::clearTraversedPath()

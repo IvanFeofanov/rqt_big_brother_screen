@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>688</width>
-    <height>521</height>
+    <height>522</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,57 +17,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="pushButtonSettings">
-       <property name="text">
-        <string>Settings...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonZoomOne">
+      <widget class="QToolButton" name="toolButtonZoomOne">
        <property name="text">
         <string>Zoom 1</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonArea">
-       <property name="text">
-        <string>Area</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonBarriers">
-       <property name="text">
-        <string>Barriers</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonRobot">
-       <property name="text">
-        <string>Robot</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonClearPath">
-       <property name="text">
-        <string>Clear path</string>
        </property>
       </widget>
      </item>
@@ -83,6 +35,20 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonCancelEdit">
+       <property name="text">
+        <string>&amp;Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonSaveEdit">
+       <property name="text">
+        <string>&amp;Save</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
