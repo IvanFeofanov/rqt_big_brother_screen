@@ -235,6 +235,8 @@ bool BigBrotherScreen::isEditView()
 
 void BigBrotherScreen::setEditView(bool is_edit_view)
 {
+    ((GraphicsSceneWithMenu*)ui_.graphicsView->scene())->enableMenu(!is_edit_view);
+
     if(is_edit_view){
         ui_.pushButtonSaveEdit->show();
         ui_.pushButtonCancelEdit->show();

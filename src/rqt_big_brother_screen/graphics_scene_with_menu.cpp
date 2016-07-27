@@ -39,8 +39,18 @@ QMenu *GraphicsSceneWithMenu::menu() const
     return menu_;
 }
 
+void GraphicsSceneWithMenu::enableMenu(bool is_enable)
+{
+    is_menu_enable_ = is_enable;
+}
+
+bool GraphicsSceneWithMenu::isMenuEnable()
+{
+    return is_menu_enable_;
+}
+
 void GraphicsSceneWithMenu::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    if(menu_ != 0)
+    if(menu_ != 0 && is_menu_enable_)
         menu_->exec(event->screenPos());
 }
