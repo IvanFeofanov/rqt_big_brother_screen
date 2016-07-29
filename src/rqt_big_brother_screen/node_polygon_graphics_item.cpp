@@ -25,11 +25,16 @@ NodePolygonGraphicsItem::NodePolygonGraphicsItem(int id,
     setFlags(QGraphicsItem::ItemIsMovable);
 }
 
-QPointF NodePolygonGraphicsItem::centerPoint()
+QPointF NodePolygonGraphicsItem::centerPoint() const 
 {
     QPointF centerP(pos().x() + rect().width() / 2,
                     pos().y() + rect().height() / 2);
     return centerP;
+}
+
+void NodePolygonGraphicsItem::setSize(const QSize& size)
+{
+    createNode(rect().topLeft(), size);
 }
 
 void NodePolygonGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)

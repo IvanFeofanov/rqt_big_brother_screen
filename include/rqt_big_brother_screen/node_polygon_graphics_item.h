@@ -13,7 +13,9 @@ public:
             const QSize &size, PolygonGraphicsItem* polygon_item,
             QGraphicsItem* parent = 0);
 
-    QPointF centerPoint();
+    QPointF centerPoint() const;
+
+    void setSize(const QSize& size);
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);

@@ -5,15 +5,18 @@
 
 #include <rqt_big_brother_screen/image_graphics_item.h>
 #include <rqt_big_brother_screen/editable_polygon_graphics_item.h>
+#include <rqt_big_brother_screen/barrier_graphics_item.h>
 #include <rqt_big_brother_screen/trajectory_graphics_item.h>
 
 #include <rqt_big_brother_screen/edit_mode.h>
 #include <rqt_big_brother_screen/area_edit_mode.h>
+#include <rqt_big_brother_screen/barrier_edit_mode.h>
 
 #include <rqt_gui_cpp/plugin.h>
 #include <image_transport/image_transport.h>
 
 #include <QWidget>
+#include <QSet>
 #include <QGraphicsPixmapItem>
 
 namespace rqt_big_brother_screen
@@ -45,16 +48,20 @@ private:
     void createAreaItem();
     void createTraversedPathItem();
 
-    bool isEditView();
+    void setEditView(bool is_edit_view = false);
+    void setEditMode(EditMode* edit_mode = 0);
 
 private slots:
-    void setEditView(bool is_edit_view = false);
     void saveEdit();
     void cancelEdit();
 
     void editSettings();
     void setZoomOne();
     void editArea();
+
+    void addBarrier();
+    void editBarriers();
+
     void clearTraversedPath();
 
 private:
@@ -68,7 +75,6 @@ private:
     QAction* action_edit_area_;
     QAction* action_add_barrier_;
     QAction* action_edit_barriers_;
-    QAction* action_remove_barriers_;
     QAction* action_show_path_;
     QAction* action_show_trajectory_;
     QAction* action_clear_path_;
@@ -80,6 +86,7 @@ private:
     EditablePolygonGraphicsItem* area_item_;
     TrajectoryGraphicsItem* traversed_path_item_;
 
+    QList<BarrierGraphicsItem*> barriers_;
 };
 
 }

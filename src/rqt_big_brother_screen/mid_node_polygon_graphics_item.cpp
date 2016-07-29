@@ -30,6 +30,11 @@ void MidNodePolygonGraphicsItem::setPos(qreal x, qreal y)
     setPos(QPointF(x, y));
 }
 
+void MidNodePolygonGraphicsItem::setSize(const QSize &size)
+{
+    createNode(pos(), size);
+}
+
 QPointF MidNodePolygonGraphicsItem::pos() const
 {
     QPointF point(QGraphicsEllipseItem::pos().x() + rect().width() / 2,

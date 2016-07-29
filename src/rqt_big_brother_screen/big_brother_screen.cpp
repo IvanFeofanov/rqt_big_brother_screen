@@ -54,19 +54,21 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     //save edit
     connect(ui_.pushButtonSaveEdit, SIGNAL(pressed()),
             this, SLOT(saveEdit()));
-    connect(ui_.pushButtonSaveEdit, SIGNAL(pressed()),
-            this, SLOT(setEditView()));
     //cancel edit
     connect(ui_.pushButtonCancelEdit, SIGNAL(pressed()),
             this, SLOT(cancelEdit()));
-    connect(ui_.pushButtonCancelEdit, SIGNAL(pressed()),
-            this, SLOT(setEditView()));
     //edit settings
     connect(action_edit_settings_, SIGNAL(triggered()),
             this, SLOT(editSettings()));
     //edit area
     connect(action_edit_area_, SIGNAL(triggered()),
             this, SLOT(editArea()));
+    //add barrier
+    connect(action_add_barrier_, SIGNAL(triggered()),
+            this, SLOT(addBarrier()));
+    //edit barriers
+    connect(action_edit_barriers_, SIGNAL(triggered()),
+            this, SLOT(editBarriers()));
     //clear path
     connect(action_clear_path_, SIGNAL(triggered()),
             this, SLOT(clearTraversedPath()));
@@ -153,7 +155,6 @@ void BigBrotherScreen::createActions()
 
     action_add_barrier_ = new QAction("Add Barrier", this);
     action_edit_barriers_ = new QAction("Edit Barriers", this);
-    action_remove_barriers_ = new QAction("Remove Barriers", this);
 
     action_show_path_ = new QAction("Show Path", this);
     action_show_path_->setCheckable(true);
@@ -187,7 +188,6 @@ void BigBrotherScreen::createContextMenu()
 
     menu->addAction(action_add_barrier_);
     menu->addAction(action_edit_barriers_);
-    menu->addAction(action_remove_barriers_);
 
     menu->addSeparator();
 
@@ -220,17 +220,16 @@ void BigBrotherScreen::createAreaItem()
                         center_point.y() + scene_rect.height() / 4);
 
     area_item_ = new EditablePolygonGraphicsItem(polygon);
+    QPen pen = area_item_->mainPen();
+    pen.setColor(qRgb(0, 255, 0));
+    area_item_->setMainPen(pen);
+
     ui_.graphicsView->scene()->addItem(area_item_);
 }
 
 void BigBrotherScreen::createTraversedPathItem()
 {
     traversed_path_item_ = new TrajectoryGraphicsItem();
-}
-
-bool BigBrotherScreen::isEditView()
-{
-    return ui_.pushButtonSaveEdit->isVisible();
 }
 
 void BigBrotherScreen::setEditView(bool is_edit_view)
@@ -246,13 +245,19 @@ void BigBrotherScreen::setEditView(bool is_edit_view)
     }
 }
 
+void BigBrotherScreen::setEditMode(EditMode* edit_mode)
+{
+    delete edit_mode_;
+    edit_mode_ = edit_mode;
+    setEditView(edit_mode_ == 0 ? false : true);
+}
+
 void BigBrotherScreen::saveEdit()
 {
     if(edit_mode_ != 0)
         edit_mode_->save();
 
-    delete edit_mode_; //edit end
-    edit_mode_ = 0;
+    setEditMode(0); //no mode
 }
 
 void BigBrotherScreen::cancelEdit()
@@ -260,8 +265,7 @@ void BigBrotherScreen::cancelEdit()
     if(edit_mode_ != 0)
         edit_mode_->cancel();
 
-    delete edit_mode_; //edit end
-    edit_mode_ = 0;
+    setEditMode(0); //no mode
 }
 
 void BigBrotherScreen::editSettings()
@@ -288,9 +292,35 @@ void BigBrotherScreen::setZoomOne()
 
 void BigBrotherScreen::editArea()
 {
-    delete edit_mode_;
-    edit_mode_ = new AreaEditMode(area_item_, this);
-    setEditView(true);
+    setEditMode(new AreaEditMode(area_item_, this));
+}
+
+void BigBrotherScreen::addBarrier()
+{
+    QPolygonF polygon;
+    QRectF scene_rect = ui_.graphicsView->scene()->sceneRect();
+    QPointF center_point(scene_rect.width() / 2, scene_rect.height() / 2);
+    polygon << QPointF( center_point.x() - scene_rect.width() / 10,
+                        center_point.y() - scene_rect.height() / 10)
+            << QPointF( center_point.x() + scene_rect.width() / 10,
+                        center_point.y() - scene_rect.height() / 10)
+            << QPointF( center_point.x() + scene_rect.width() / 10,
+                        center_point.y() + scene_rect.height() / 10)
+            << QPointF( center_point.x() - scene_rect.width() / 10,
+                        center_point.y() + scene_rect.height() / 10);
+
+    BarrierGraphicsItem* barrier_item =
+        new BarrierGraphicsItem(polygon);
+
+    ui_.graphicsView->scene()->addItem(barrier_item);
+    barriers_.push_back(barrier_item);
+
+    editBarriers();
+}
+
+void BigBrotherScreen::editBarriers()
+{
+    setEditMode(new BarrierEditMode(&barriers_, this));
 }
 
 void BigBrotherScreen::clearTraversedPath()

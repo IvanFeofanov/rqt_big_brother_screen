@@ -12,6 +12,9 @@ public:
 
     void setPos(const QPointF &pos);
     void setPos(qreal x, qreal y);
+
+    void setSize(const QSize &size);
+
     QPointF pos() const;
 
 protected:

@@ -6,6 +6,9 @@
 #include <QGraphicsPolygonItem>
 #include <QList>
 
+#include <QPen>
+#include <QBrush>
+
 class PolygonGraphicsItem : public QGraphicsPolygonItem
 {
 public:
@@ -17,7 +20,15 @@ public:
 
     void setPolygon(const QPolygonF &polygon);
 
+    void setPen(const QPen& pen);
+    void setBrush(const QBrush& brush);
+
+    void setMidNodeSize(const QSize& size);
+    QSize midNodeSize() const;
+
 private:
+    void setDefaultParameters();
+
     void createMidNodes(int n);
     void updateMidNodes();
     QPoint getMiddlePoint(int node_id);
@@ -25,6 +36,9 @@ private:
 private:
     QList<MidNodePolygonGraphicsItem*> mid_nodes_;
     int current_polygon_size_;
+
+    QSize mid_node_size_;
+
 };
 
 #endif // POLYGON_GRAPHICS_ITEM_H

@@ -1,5 +1,5 @@
 #include <rqt_big_brother_screen/area_edit_mode.h>
-#include <iostream>
+
 AreaEditMode::AreaEditMode(QObject* parent) :
     EditMode(parent)
 {
@@ -15,20 +15,18 @@ AreaEditMode::AreaEditMode(EditablePolygonGraphicsItem* polygon_item,
     polygon_item_ = polygon_item;
     /*TODO ros::topic*/
 
+    saved_polygon_ = polygon_item_->polygon();
     polygon_item_->setEditable(true);
 }
 
 void AreaEditMode::cancel()
 {
-    endEdit();
+    polygon_item_->setPolygon(saved_polygon_);
+    polygon_item_->setEditable(false);
 }
 
 void AreaEditMode::save()
 {
-    endEdit();
-}
-
-void AreaEditMode::endEdit()
-{
     polygon_item_->setEditable(false);
+    /*TODO ros::send*/
 }
