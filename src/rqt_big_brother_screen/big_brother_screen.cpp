@@ -45,6 +45,7 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     createImageItem();
     createAreaItem();
     createTraversedPathItem();
+    createTrajectoryItem();
 
     setEditView(false);
 
@@ -69,6 +70,12 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     //edit barriers
     connect(action_edit_barriers_, SIGNAL(triggered()),
             this, SLOT(editBarriers()));
+    //show traversed path
+    connect(action_show_path_, SIGNAL(triggered(bool)),
+            this, SLOT(showTraversedPath(bool)));
+    //show trajectory
+    connect(action_show_trajectory_, SIGNAL(triggered(bool)),
+            this, SLOT(showTrajectory(bool)));
     //clear path
     connect(action_clear_path_, SIGNAL(triggered()),
             this, SLOT(clearTraversedPath()));
@@ -84,6 +91,12 @@ void BigBrotherScreen::shutdownPlugin()
     delete image_item_;
     delete area_item_;
     delete traversed_path_item_;
+    delete trajectory_item_;
+
+    foreach(BarrierGraphicsItem* item, barriers_)
+        delete item;
+
+    barriers_.clear();
 }
 
 void BigBrotherScreen::saveSettings(qt_gui_cpp::Settings& plugin_settings,
@@ -230,11 +243,26 @@ void BigBrotherScreen::createAreaItem()
 void BigBrotherScreen::createTraversedPathItem()
 {
     traversed_path_item_ = new TrajectoryGraphicsItem();
+    ui_.graphicsView->scene()->addItem(traversed_path_item_);
+    showTraversedPath(false);
+}
+
+void BigBrotherScreen::createTrajectoryItem()
+{
+    trajectory_item_ = new TrajectoryGraphicsItem();
+    QPen pen = trajectory_item_->pen();
+    pen.setWidth(2);
+    pen.setColor(QColor(255, 0, 0, 55));
+    trajectory_item_->setPen(pen);
+
+    ui_.graphicsView->scene()->addItem(trajectory_item_);
+    showTrajectory(false);
 }
 
 void BigBrotherScreen::setEditView(bool is_edit_view)
 {
-    ((GraphicsSceneWithMenu*)ui_.graphicsView->scene())->enableMenu(!is_edit_view);
+    ((GraphicsSceneWithMenu*)ui_.graphicsView->scene())->
+        enableMenu(!is_edit_view);
 
     if(is_edit_view){
         ui_.pushButtonSaveEdit->show();
@@ -323,8 +351,33 @@ void BigBrotherScreen::editBarriers()
     setEditMode(new BarrierEditMode(&barriers_, this));
 }
 
+void BigBrotherScreen::showTraversedPath(bool is_show)
+{
+    if(traversed_path_item_ == 0)
+        return;
+
+    if(is_show)
+        traversed_path_item_->show();
+    else
+        traversed_path_item_->hide();
+}
+
+void BigBrotherScreen::showTrajectory(bool is_show)
+{
+    if(trajectory_item_ == 0)
+        return;
+
+    if(is_show)
+        trajectory_item_->show();
+    else
+        trajectory_item_->hide();
+}
+
 void BigBrotherScreen::clearTraversedPath()
 {
+    if(traversed_path_item_ == 0)
+        return;
+
     traversed_path_item_->clear();
     //TODO
 }

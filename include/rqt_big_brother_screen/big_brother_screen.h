@@ -47,6 +47,7 @@ private:
     void createImageItem();
     void createAreaItem();
     void createTraversedPathItem();
+    void createTrajectoryItem();
 
     void setEditView(bool is_edit_view = false);
     void setEditMode(EditMode* edit_mode = 0);
@@ -62,6 +63,8 @@ private slots:
     void addBarrier();
     void editBarriers();
 
+    void showTraversedPath(bool is_show);
+    void showTrajectory(bool is_show);
     void clearTraversedPath();
 
 private:
@@ -85,6 +88,7 @@ private:
     ImageGraphicsItem* image_item_;
     EditablePolygonGraphicsItem* area_item_;
     TrajectoryGraphicsItem* traversed_path_item_;
+    TrajectoryGraphicsItem* trajectory_item_;
 
     QList<BarrierGraphicsItem*> barriers_;
 };

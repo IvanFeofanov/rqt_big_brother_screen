@@ -26,6 +26,8 @@ public:
     QPen pen() const;
 
 private:
+    void setDefaultParameters();
+private:
     QList<QPointF> trajectory_;
     QList<QGraphicsLineItem*> lines_;
 

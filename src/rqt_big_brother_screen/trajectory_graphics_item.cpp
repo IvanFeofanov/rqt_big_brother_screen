@@ -3,18 +3,15 @@
 TrajectoryGraphicsItem::TrajectoryGraphicsItem(QGraphicsItem *parent) :
     QGraphicsItemGroup(parent)
 {
+    setDefaultParameters();
 }
 
 TrajectoryGraphicsItem::TrajectoryGraphicsItem(const QList<QPointF> &trajectory,
         QGraphicsItem *parent) :
     QGraphicsItemGroup(parent)
 {
-    //default style
-    pen_.setColor(QColor(0, 0, 255, 55));
-    pen_.setWidth(5);
-
     setTrajectory(trajectory);
-
+    setDefaultParameters();
 }
 
 void TrajectoryGraphicsItem::setTrajectory(const QList<QPointF> &trajectory)
@@ -67,4 +64,11 @@ void TrajectoryGraphicsItem::setPen(const QPen &pen)
 QPen TrajectoryGraphicsItem::pen() const
 {
     return pen_;
+}
+
+void TrajectoryGraphicsItem::setDefaultParameters()
+{
+    //default style
+    pen_.setColor(QColor(0, 0, 255, 55));
+    pen_.setWidth(5);
 }
