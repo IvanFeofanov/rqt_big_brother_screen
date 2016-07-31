@@ -47,6 +47,7 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     createTraversedPathItem();
     createTrajectoryItem();
     createSelectToolItem();
+    createRobotItem();
 
     setEditView(false);
 
@@ -83,6 +84,9 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     //select robot
     connect(action_select_robot_, SIGNAL(triggered()),
             this, SLOT(selectRobot()));
+    //show robot
+    connect(action_show_robot_, SIGNAL(triggered(bool)),
+            this, SLOT(showRobot(bool)));
 
     //image transport subscriber
     setTopicImage("");
@@ -92,11 +96,14 @@ void BigBrotherScreen::shutdownPlugin()
 {
     image_subscriber_.shutdown();
 
+    delete edit_mode_;
+
     delete image_item_;
     delete area_item_;
     delete traversed_path_item_;
     delete trajectory_item_;
     delete select_tool_item_;
+    delete robot_item_;
 
     foreach(BarrierGraphicsItem* item, barriers_)
         delete item;
@@ -182,6 +189,9 @@ void BigBrotherScreen::createActions()
     action_clear_path_ = new QAction("Clear Path", this);
 
     action_select_robot_ = new QAction("Select The Robot", this);
+    action_show_robot_ = new QAction("Show The Robot", this);
+    action_show_robot_->setCheckable(true);
+    action_show_robot_->setChecked(true);
 }
 
 void BigBrotherScreen::createButtons()
@@ -196,7 +206,7 @@ void BigBrotherScreen::createContextMenu()
     GraphicsSceneWithMenu* scene =
         (GraphicsSceneWithMenu*)ui_.graphicsView->scene();
 
-    QMenu* menu = new QMenu("file", ui_.graphicsView);
+    QMenu* menu = new QMenu("Context Menu", ui_.graphicsView);
     menu->addAction(action_edit_settings_);
 
     menu->addSeparator();
@@ -217,6 +227,7 @@ void BigBrotherScreen::createContextMenu()
     menu->addSeparator();
 
     menu->addAction(action_select_robot_);
+    menu->addAction(action_show_robot_);
 
     scene->setMenu(menu);
 }
@@ -280,6 +291,16 @@ void BigBrotherScreen::createSelectToolItem()
     ui_.graphicsView->scene()->addItem(select_tool_item_);
 
     select_tool_item_->hide();
+}
+
+void BigBrotherScreen::createRobotItem()
+{
+    robot_item_ = new QGraphicsRectItem(QRectF());
+    ui_.graphicsView->scene()->addItem(robot_item_);
+    QPen pen;
+    pen.setWidth(1);
+    pen.setColor(QColor(255, 0, 0));
+    robot_item_->setPen(pen);
 }
 
 void BigBrotherScreen::setEditView(bool is_edit_view)
@@ -374,23 +395,23 @@ void BigBrotherScreen::editBarriers()
     setEditMode(new BarrierEditMode(&barriers_, this));
 }
 
-void BigBrotherScreen::showTraversedPath(bool is_show)
+void BigBrotherScreen::showTraversedPath(bool is_visible)
 {
     if(traversed_path_item_ == 0)
         return;
 
-    if(is_show)
+    if(is_visible)
         traversed_path_item_->show();
     else
         traversed_path_item_->hide();
 }
 
-void BigBrotherScreen::showTrajectory(bool is_show)
+void BigBrotherScreen::showTrajectory(bool is_visible)
 {
     if(trajectory_item_ == 0)
         return;
 
-    if(is_show)
+    if(is_visible)
         trajectory_item_->show();
     else
         trajectory_item_->hide();
@@ -408,6 +429,16 @@ void BigBrotherScreen::clearTraversedPath()
 void BigBrotherScreen::selectRobot()
 {
     setEditMode(new SelectRobotEditMode(select_tool_item_, this));
+}
+
+void BigBrotherScreen::showRobot(bool is_visible)
+{
+    if(is_visible){
+        robot_item_->show();
+    }else{
+        robot_item_->hide();
+    }
+
 }
 
 }//namespace

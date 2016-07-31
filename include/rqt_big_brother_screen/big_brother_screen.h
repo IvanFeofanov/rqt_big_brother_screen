@@ -20,6 +20,7 @@
 #include <QWidget>
 #include <QSet>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsRectItem>
 
 namespace rqt_big_brother_screen
 {
@@ -51,6 +52,7 @@ private:
     void createTraversedPathItem();
     void createTrajectoryItem();
     void createSelectToolItem();
+    void createRobotItem();
 
     void setEditView(bool is_edit_view = false);
     void setEditMode(EditMode* edit_mode = 0);
@@ -66,11 +68,12 @@ private slots:
     void addBarrier();
     void editBarriers();
 
-    void showTraversedPath(bool is_show);
-    void showTrajectory(bool is_show);
+    void showTraversedPath(bool is_visible);
+    void showTrajectory(bool is_visible);
     void clearTraversedPath();
 
     void selectRobot();
+    void showRobot(bool is_visible);
 
 private:
     Ui::Window ui_;
@@ -87,6 +90,7 @@ private:
     QAction* action_show_trajectory_;
     QAction* action_clear_path_;
     QAction* action_select_robot_;
+    QAction* action_show_robot_;
 
     image_transport::Subscriber image_subscriber_;
 
@@ -95,6 +99,7 @@ private:
     TrajectoryGraphicsItem* traversed_path_item_;
     TrajectoryGraphicsItem* trajectory_item_;
     EditableRectGraphicsItem* select_tool_item_;
+    QGraphicsRectItem* robot_item_;
 
     QList<BarrierGraphicsItem*> barriers_;
 };

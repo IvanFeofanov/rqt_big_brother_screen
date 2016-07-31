@@ -25,7 +25,7 @@ NodePolygonGraphicsItem::NodePolygonGraphicsItem(int id,
     setFlags(QGraphicsItem::ItemIsMovable);
 }
 
-QPointF NodePolygonGraphicsItem::centerPoint() const 
+QPointF NodePolygonGraphicsItem::centerPoint() const
 {
     QPointF centerP(pos().x() + rect().width() / 2,
                     pos().y() + rect().height() / 2);
@@ -39,8 +39,8 @@ void NodePolygonGraphicsItem::setSize(const QSize& size)
 
 void NodePolygonGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    polygon_item_->updateNode(id_, centerPoint());
     QGraphicsEllipseItem::mouseMoveEvent(event);
+    polygon_item_->updateNode(id_, centerPoint());
 }
 
 void NodePolygonGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
