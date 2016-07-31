@@ -46,6 +46,7 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     createAreaItem();
     createTraversedPathItem();
     createTrajectoryItem();
+    createSelectToolItem();
 
     setEditView(false);
 
@@ -79,6 +80,9 @@ void BigBrotherScreen::initPlugin(qt_gui_cpp::PluginContext& context)
     //clear path
     connect(action_clear_path_, SIGNAL(triggered()),
             this, SLOT(clearTraversedPath()));
+    //select robot
+    connect(action_select_robot_, SIGNAL(triggered()),
+            this, SLOT(selectRobot()));
 
     //image transport subscriber
     setTopicImage("");
@@ -92,6 +96,7 @@ void BigBrotherScreen::shutdownPlugin()
     delete area_item_;
     delete traversed_path_item_;
     delete trajectory_item_;
+    delete select_tool_item_;
 
     foreach(BarrierGraphicsItem* item, barriers_)
         delete item;
@@ -104,7 +109,8 @@ void BigBrotherScreen::saveSettings(qt_gui_cpp::Settings& plugin_settings,
 {
 }
 
-void BigBrotherScreen::restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
+void BigBrotherScreen::restoreSettings(
+        const qt_gui_cpp::Settings& plugin_settings,
         const qt_gui_cpp::Settings& instance_settings)
 {
 }
@@ -207,6 +213,9 @@ void BigBrotherScreen::createContextMenu()
     menu->addAction(action_show_path_);
     menu->addAction(action_show_trajectory_);
     menu->addAction(action_clear_path_);
+
+    menu->addSeparator();
+
     menu->addAction(action_select_robot_);
 
     scene->setMenu(menu);
@@ -257,6 +266,20 @@ void BigBrotherScreen::createTrajectoryItem()
 
     ui_.graphicsView->scene()->addItem(trajectory_item_);
     showTrajectory(false);
+}
+
+void BigBrotherScreen::createSelectToolItem()
+{
+    QRectF scene_rect = ui_.graphicsView->scene()->sceneRect();
+    QPointF center_point = scene_rect.center();
+    QSize size(50, 50);
+    QPointF pos(center_point.x() - size.width() / 2,
+                center_point.y() - size.height() / 2);
+    select_tool_item_ = new EditableRectGraphicsItem(QRect(pos.toPoint(), size));
+
+    ui_.graphicsView->scene()->addItem(select_tool_item_);
+
+    select_tool_item_->hide();
 }
 
 void BigBrotherScreen::setEditView(bool is_edit_view)
@@ -380,6 +403,11 @@ void BigBrotherScreen::clearTraversedPath()
 
     traversed_path_item_->clear();
     //TODO
+}
+
+void BigBrotherScreen::selectRobot()
+{
+    setEditMode(new SelectRobotEditMode(select_tool_item_, this));
 }
 
 }//namespace

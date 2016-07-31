@@ -7,10 +7,12 @@
 #include <rqt_big_brother_screen/editable_polygon_graphics_item.h>
 #include <rqt_big_brother_screen/barrier_graphics_item.h>
 #include <rqt_big_brother_screen/trajectory_graphics_item.h>
+#include <rqt_big_brother_screen/editable_rect_graphics_item.h>
 
 #include <rqt_big_brother_screen/edit_mode.h>
 #include <rqt_big_brother_screen/area_edit_mode.h>
 #include <rqt_big_brother_screen/barrier_edit_mode.h>
+#include <rqt_big_brother_screen/select_robot_edit_mode.h>
 
 #include <rqt_gui_cpp/plugin.h>
 #include <image_transport/image_transport.h>
@@ -48,6 +50,7 @@ private:
     void createAreaItem();
     void createTraversedPathItem();
     void createTrajectoryItem();
+    void createSelectToolItem();
 
     void setEditView(bool is_edit_view = false);
     void setEditMode(EditMode* edit_mode = 0);
@@ -66,6 +69,8 @@ private slots:
     void showTraversedPath(bool is_show);
     void showTrajectory(bool is_show);
     void clearTraversedPath();
+
+    void selectRobot();
 
 private:
     Ui::Window ui_;
@@ -89,6 +94,7 @@ private:
     EditablePolygonGraphicsItem* area_item_;
     TrajectoryGraphicsItem* traversed_path_item_;
     TrajectoryGraphicsItem* trajectory_item_;
+    EditableRectGraphicsItem* select_tool_item_;
 
     QList<BarrierGraphicsItem*> barriers_;
 };
