@@ -103,7 +103,7 @@ void BigBrotherScreen::shutdownPlugin()
     delete traversed_path_item_;
     delete trajectory_item_;
     delete select_tool_item_;
-    delete robot_item_;
+    delete marker_robot_item_;
 
     foreach(BarrierGraphicsItem* item, barriers_)
         delete item;
@@ -114,12 +114,33 @@ void BigBrotherScreen::shutdownPlugin()
 void BigBrotherScreen::saveSettings(qt_gui_cpp::Settings& plugin_settings,
         qt_gui_cpp::Settings& instance_settings) const
 {
+    QString topic = QString::fromStdString(image_subscriber_.getTopic());
+    instance_settings.setValue("topic", topic);
+
+    instance_settings.setValue("show_path", action_show_path_->isChecked());
+    instance_settings.setValue("show_trajectory",
+            action_show_trajectory_->isChecked());
+    instance_settings.setValue("show_robot", action_show_robot_->isChecked());
 }
 
 void BigBrotherScreen::restoreSettings(
         const qt_gui_cpp::Settings& plugin_settings,
         const qt_gui_cpp::Settings& instance_settings)
 {
+    QString topic = instance_settings.value("topic", "").toString();
+    setTopicImage(topic);
+
+    bool show_path_checked = instance_settings.value("show_path", true).toBool();
+    action_show_path_->setChecked(show_path_checked);
+
+    bool show_trajectory_checked = instance_settings.value("show_trajectory",
+            false).toBool();
+    action_show_trajectory_->setChecked(show_trajectory_checked);
+
+    bool show_robot_checked = instance_settings.value("show_robot",
+            true).toBool();
+    action_show_robot_->setChecked(show_robot_checked);
+
 }
 
 void BigBrotherScreen::callbackImage(const sensor_msgs::ImageConstPtr &msg)
@@ -191,7 +212,7 @@ void BigBrotherScreen::createActions()
     action_select_robot_ = new QAction("Select The Robot", this);
     action_show_robot_ = new QAction("Show The Robot", this);
     action_show_robot_->setCheckable(true);
-    action_show_robot_->setChecked(true);
+    // action_show_robot_->setChecked(true);
 }
 
 void BigBrotherScreen::createButtons()
@@ -295,12 +316,12 @@ void BigBrotherScreen::createSelectToolItem()
 
 void BigBrotherScreen::createRobotItem()
 {
-    robot_item_ = new QGraphicsRectItem(QRectF());
-    ui_.graphicsView->scene()->addItem(robot_item_);
+    marker_robot_item_ = new QGraphicsRectItem(QRectF());
+    ui_.graphicsView->scene()->addItem(marker_robot_item_);
     QPen pen;
     pen.setWidth(1);
     pen.setColor(QColor(255, 0, 0));
-    robot_item_->setPen(pen);
+    marker_robot_item_->setPen(pen);
 }
 
 void BigBrotherScreen::setEditView(bool is_edit_view)
@@ -434,9 +455,9 @@ void BigBrotherScreen::selectRobot()
 void BigBrotherScreen::showRobot(bool is_visible)
 {
     if(is_visible){
-        robot_item_->show();
+        marker_robot_item_->show();
     }else{
-        robot_item_->hide();
+        marker_robot_item_->hide();
     }
 
 }

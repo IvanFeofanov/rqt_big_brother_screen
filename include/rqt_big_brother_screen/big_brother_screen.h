@@ -99,7 +99,7 @@ private:
     TrajectoryGraphicsItem* traversed_path_item_;
     TrajectoryGraphicsItem* trajectory_item_;
     EditableRectGraphicsItem* select_tool_item_;
-    QGraphicsRectItem* robot_item_;
+    QGraphicsRectItem* marker_robot_item_;
 
     QList<BarrierGraphicsItem*> barriers_;
 };
